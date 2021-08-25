@@ -18,7 +18,6 @@ class LoginSerializer(serializers.Serializer):
 
     def validate(self, data):
         user = authenticate(**data)
-        # user = authenticate(username=data['username'],password=data['password'])
         if user and user.is_authenticated:
             return user
         raise serializers.ValidationError("Incorrect.")

@@ -13,4 +13,6 @@ urlpatterns = [
     path('grp_admin_create/', Make_Admin.as_view()),
     path('grp_admin_remove/', Remove_Admin.as_view()),
     path('grp_member_remove/', Remove_Member.as_view()),
+    path('friends/', GetFriends.as_view()),
+    path('groups/', GetGroups.as_view()),
 ]

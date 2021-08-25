@@ -1,8 +1,7 @@
 from django.urls import path
 
-from . import views
+from .views import RequestRoomAccessView
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('<str:room_name>/', views.room, name='room'),
+    path('room_access/', RequestRoomAccessView.as_view()),
 ]
