@@ -31,6 +31,7 @@ class LoginView(generics.GenericAPIView):
             send_mail(user.email,subject,message)
             return Response({'msg': 'Email is not verified, check your mail.'}, status=401)
         dic = {'token': str(create_auth_token(user))}
+        login(request, user)
         return Response(dic, status=status.HTTP_200_OK)
 
 class RegisterView(generics.GenericAPIView):
