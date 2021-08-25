@@ -1,3 +1,4 @@
+from django.contrib.auth import login
 from django.core.mail import message
 from random import randint
 from authentication.models import ForgotPwdRequest, UserInfo, msg
@@ -28,7 +29,7 @@ class LoginView(generics.GenericAPIView):
             subject = 'Verify Commutify Account'
             message = f'Hi click the link to verify your commutify account http://commutify-server.herokuapp.com/auth/verify/{user.username}/{user.verify_pin}/'
             send_mail(user.email,subject,message)
-            return Response({'msg': 'Email is not verified, check your mail.'}, status=400)
+            return Response({'msg': 'Email is not verified, check your mail.'}, status=401)
         dic = {'token': str(create_auth_token(user))}
         return Response(dic, status=status.HTTP_200_OK)
 

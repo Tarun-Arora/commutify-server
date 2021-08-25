@@ -18,7 +18,13 @@ class ChatConsumer(WebsocketConsumer):
             self.channel_name
         )
 
-        self.accept()
+        try:
+            user = self.scope['user']
+            chat = Chat.objects.get(title=self.room_name)
+        except:
+            return
+        if user in chat.users.all():
+            self.accept()
 
     def disconnect(self, close_code):
         # Leave room group
@@ -43,7 +49,7 @@ class ChatConsumer(WebsocketConsumer):
             {
                 'type': 'chat_message',
                 'message': message,
-                'sender': sender
+                'sender': str(sender)
             }
         )
 

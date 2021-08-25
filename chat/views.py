@@ -38,6 +38,8 @@ def room(request, room_name):
         return render(request, 'chat/room.html', {
             'room_name': room_name
         })
+    return HttpResponseNotFound('<h1>Page not found</h1>')
+
 
 
 
