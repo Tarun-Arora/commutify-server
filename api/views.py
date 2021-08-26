@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from .serializers import *
 
 
-# Create your views here.
 class Fr_Request(generics.GenericAPIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [IsAuthenticated, ]
@@ -19,8 +18,6 @@ class Fr_Request(generics.GenericAPIView):
         return Response({'message': 'Success'})
 
 
-
-
 class Fr_Response(generics.GenericAPIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [IsAuthenticated, ]
@@ -31,8 +28,6 @@ class Fr_Response(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         r = serializer.save()
         return Response({'message': 'Success'})
-
-
 
 
 class Fr_Remove(generics.GenericAPIView):
@@ -59,9 +54,6 @@ class Grp_Request(generics.GenericAPIView):
         return Response({'message': 'Success'})
 
 
-
-
-
 class Grp_Response(generics.GenericAPIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [IsAuthenticated, ]
@@ -72,7 +64,6 @@ class Grp_Response(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         r = serializer.save()
         return Response({'message': 'Success'})
-
 
 
 class Grp_Create(generics.GenericAPIView):
@@ -99,21 +90,18 @@ class Grp_Exit(generics.GenericAPIView):
         return Response({'message': 'Success'})
 
 
-
-
-
 class Make_Admin(generics.GenericAPIView):
     authentication_classes = [authentication.TokenAuthentication]
     permission_classes = [IsAuthenticated, ]
     serializer_class = NewAdminSerializer
 
-
     def post(self, request, *args, **kwargs):
         user = request.user
-        serializer = self.get_serializer(data=request.data,context={'user':user})
+        serializer = self.get_serializer(data=request.data, context={'user': user})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({})
+
 
 class Remove_Admin(generics.GenericAPIView):
     authentication_classes = [authentication.TokenAuthentication]
@@ -122,10 +110,11 @@ class Remove_Admin(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        serializer = self.get_serializer(data=request.data,context={'user':user})
+        serializer = self.get_serializer(data=request.data, context={'user': user})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({})
+
 
 class Remove_Member(generics.GenericAPIView):
     authentication_classes = [authentication.TokenAuthentication]
@@ -134,10 +123,11 @@ class Remove_Member(generics.GenericAPIView):
 
     def post(self, request, *args, **kwargs):
         user = request.user
-        serializer = self.get_serializer(data=request.data,context={'user':user})
+        serializer = self.get_serializer(data=request.data, context={'user': user})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({})
+
 
 class RetrieveMessage(generics.GenericAPIView):
     authentication_classes = [authentication.TokenAuthentication]
@@ -151,3 +141,47 @@ class RetrieveMessage(generics.GenericAPIView):
         return Response(r)
 
 
+class GetFriends(generics.GenericAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        friends = user.friends.all()
+        data = []
+        for fr in friends:
+            a1 = fr.chats.msgs.last()
+            a = '1970-01-01 00:00:00.430294+00:00' if a1 == None else str(a1.dttime)
+
+            data.append({
+                'id': fr.user.id,
+                'username': fr.user.username,
+                'first_name': fr.user.first_name,
+                'last_name': fr.user.last_name,
+                'status': fr.user.status,
+                'last_act': a
+            })
+        data.sort(key=lambda fr: fr['last_act'], reverse=True)
+        return Response(data)
+
+
+class GetGroups(generics.GenericAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        groups = user.groups.all()
+        data = []
+        for gr in groups:
+            a1 = gr.chats.msgs.last()
+            a = '1970-01-01 00:00:00.430294+00:00' if a1 == None else str(a1.dttime)
+
+            data.append({
+                'id': gr.id,
+                'name': gr.name,
+                'description': gr.description,
+                'last_act': a
+            })
+        data.sort(key=lambda gr: gr['last_act'], reverse=True)
+        return Response(data)
