@@ -1,3 +1,4 @@
+from django.core.paginator import Paginator
 from rest_framework import serializers
 from authentication.models import msg, Friend, UserInfo, Group, Chat
 
@@ -338,6 +339,9 @@ class RetrieveMessageSerializer(serializers.ModelSerializer):
     def validate(self, data):
         try:
             user = self.context['request'].user
+        except:
+            raise serializers.ValidationError("Invalid Information")
+        try:
             chat = Chat.objects.get(title=data['title'])
         except:
             raise serializers.ValidationError("Invalid Information")
@@ -350,9 +354,10 @@ class RetrieveMessageSerializer(serializers.ModelSerializer):
         chat = Chat.objects.get(title=data['title'])
         index = data['index']
         msg_list = msg.objects.by_chat(chat)
+        paginator = Paginator(msg_list, 15)
+        page_obj = paginator.get_page(index)
         v = []
-        for i in range(index, index + 10):
-            if i >= len(msg_list):
-                break
-            v.append({"sender": str(msg_list[i].sender_id), "dttime": msg_list[i].dttime, "message": str(msg_list[i].message)})
+        for i in page_obj.object_list:
+            v.append({"sender": str(i.sender_id), "dttime": i.dttime, "message": str(i.message)})
         return v
+
