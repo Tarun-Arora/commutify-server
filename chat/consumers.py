@@ -11,15 +11,15 @@ from authentication.models import msg, UserInfo, Chat
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
         self.room_name = self.scope['url_route']['kwargs']['room_name']
+        username = self.scope['url_route']['kwargs']['username']
         self.room_group_name = 'chat_%s' % self.room_name
 
-        # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,
             self.channel_name
         )
         try:
-            user = self.scope['user']
+            user = UserInfo.objects.get(username=username)
         except:
             return
         try:
@@ -74,7 +74,6 @@ class MessageUpdate(WebsocketConsumer):
     def connect(self):
         self.room_name = 'update'
         self.room_group_name = 'chat_%s' % self.room_name
-
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
             self.room_group_name,

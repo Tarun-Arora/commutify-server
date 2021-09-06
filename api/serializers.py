@@ -357,7 +357,7 @@ class RetrieveMessageSerializer(serializers.ModelSerializer):
         paginator = Paginator(msg_list, 15)
         page_obj = paginator.get_page(index)
         v = []
-        for i in page_obj.object_list:
-            v.append({"sender": str(i.sender_id), "dttime": i.dttime, "message": str(i.message)})
+        for i in (page_obj.object_list):
+            v.insert(0,{"id":i.id,"sender": str(i.sender_id), "dttime": i.dttime, "message": str(i.message)})
         return v
 
