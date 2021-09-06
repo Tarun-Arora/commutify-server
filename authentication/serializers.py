@@ -50,7 +50,6 @@ class ResetPasswordSerializer(serializers.ModelSerializer):
     def validate(self,data):
         try:
             pwd = ForgotPwdRequest.objects.get(email=data['email'],otp=data['otp'])
-            # print(pwd.sttime+timedelta(minutes=15),timezone.now())
             if(pwd.sttime+timedelta(minutes=15)<timezone.now()):
                 raise serializers.ValidationError('OTP Expired')
             data['pwd']=pwd
