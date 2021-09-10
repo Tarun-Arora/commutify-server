@@ -68,7 +68,7 @@ def forgotPwdOtp(request,email):
         subject = 'Commutify - Reset Password'
         otp = randint(100000,999999)
         message = f'User {user.username},\n\tYour OTP for changing the password of your Commutify Account is {otp}.\nThis OTP is valid for 15 minutes.\nDo not share this OTP with Anyone.\nIf you didn\'t request for changing your password, just ignore this email.\n\nTeam Commutify'
-        send_mail(email,token,subject,message)
+        send_mail(email,subject,message)
         obj, created = ForgotPwdRequest.objects.update_or_create(
         email=email,
         defaults={'email': email,'otp':otp},)
