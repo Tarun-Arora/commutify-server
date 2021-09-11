@@ -88,9 +88,9 @@ class ResetPwd(generics.GenericAPIView):
 
 @csrf_exempt
 @api_view(('GET',))
-def verify(request , username, verify_pin):
+def verify(request , email, verify_pin):
     try:
-        user = UserInfo.objects.get(username=username, verify_pin=verify_pin)
+        user = UserInfo.objects.get(email=email, verify_pin=verify_pin)
         if user:
             if user.is_verified:
                 return Response({'info': 'Your account is already verified.'})
