@@ -115,7 +115,8 @@ class MessageUpdate(WebsocketConsumer):
             {
                 'type': 'chat_message',
                 'room': room,
-                'message': message
+                'message': message,
+                'sender': str(user.username)
             }
         )
 
@@ -123,6 +124,7 @@ class MessageUpdate(WebsocketConsumer):
     def chat_message(self, event):
         message = event['message']
         room = event['room']
+        sender = event['sender']
 
         chat = Chat.objects.get(title=room)
         token = self.scope['url_route']['kwargs']['token']
@@ -133,6 +135,7 @@ class MessageUpdate(WebsocketConsumer):
         if user in chat.users.all():
             self.send(text_data=json.dumps({
                 'message': message,
-                'room': room
+                'room': room,
+                'sender': sender,
             }))
         # Send message to WebSocket
