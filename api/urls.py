@@ -15,4 +15,5 @@ urlpatterns = [
     path('grp_member_remove/', Remove_Member.as_view()),
     path('friends/', GetFriends.as_view()),
     path('groups/', GetGroups.as_view()),
+    path('requests/', GetRequests.as_view()),
 ]

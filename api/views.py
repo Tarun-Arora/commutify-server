@@ -185,3 +185,29 @@ class GetGroups(generics.GenericAPIView):
             })
         data.sort(key=lambda gr: gr['last_act'], reverse=True)
         return Response(data)
+
+
+class GetRequests(generics.GenericAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        groups = user.group_requests.all()
+        data = []
+        for gr in groups:
+            data.append({
+                'id': gr.id,
+                'name': gr.name,
+                'type': 1,
+                'description': gr.description
+            })
+        friends = user.friend_requests.all()
+        for fr in friends:
+            data.append({
+                'username': fr.username,
+                'first_name': fr.first_name,
+                'last_name': fr.last_name,
+                'type': 0
+            })
+        return Response(data)
