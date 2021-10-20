@@ -152,6 +152,9 @@ class GetFriends(generics.GenericAPIView):
         for fr in friends:
             a1 = fr.chats.msgs.last()
             a = '1970-01-01 00:00:00.430294+00:00' if a1 == None else str(a1.dttime)
+            x = [fr.user.username, user.username]
+            x.sort()
+            room = 'fr-' + str(x[0]) + '-' + str(x[1])
 
             data.append({
                 'id': fr.user.id,
@@ -159,7 +162,9 @@ class GetFriends(generics.GenericAPIView):
                 'first_name': fr.user.first_name,
                 'last_name': fr.user.last_name,
                 'status': fr.user.status,
-                'last_act': a
+                'last_act': a,
+                'unseen': 0,
+                'room': room
             })
         data.sort(key=lambda fr: fr['last_act'], reverse=True)
         return Response(data)
@@ -176,12 +181,41 @@ class GetGroups(generics.GenericAPIView):
         for gr in groups:
             a1 = gr.chats.msgs.last()
             a = '1970-01-01 00:00:00.430294+00:00' if a1 == None else str(a1.dttime)
+            room = 'grp-' + str(gr.id)
 
             data.append({
                 'id': gr.id,
                 'name': gr.name,
                 'description': gr.description,
-                'last_act': a
+                'last_act': a,
+                'room': room,
+                'unseen': 0,
             })
         data.sort(key=lambda gr: gr['last_act'], reverse=True)
+        return Response(data)
+
+
+class GetRequests(generics.GenericAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        groups = user.group_requests.all()
+        data = []
+        for gr in groups:
+            data.append({
+                'id': gr.id,
+                'name': gr.name,
+                'type': 1,
+                'description': gr.description
+            })
+        friends = user.friend_requests.all()
+        for fr in friends:
+            data.append({
+                'username': fr.username,
+                'first_name': fr.first_name,
+                'last_name': fr.last_name,
+                'type': 0
+            })
         return Response(data)

@@ -32,7 +32,10 @@ class RegisterSerializer(serializers.ModelSerializer):
     def clean(self):
         email = self.validated_data.get('email')
         if UserInfo.objects.filter(email=email).exists():
-            raise serializers.ValidationError("An account with this email is already created. Try logging in.")
+            raise serializers.ValidationError({"email": ["An account with this email is already created. Try logging in."]})
+        password = self.validated_data.get('password')
+        if len(password) < 6:
+            raise  serializers.ValidationError({"password": ["Password too weak, try different password"]})
         self.validated_data['verify_pin']=randint(100000,999999)
         return self.validated_data
 
