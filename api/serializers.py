@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.db.models.query_utils import Q
 from rest_framework import serializers
 from authentication.models import msg, Friend, UserInfo, Group, Chat
 
@@ -361,3 +362,52 @@ class RetrieveMessageSerializer(serializers.ModelSerializer):
             v.insert(0,{"id":i.id,"sender": str(i.sender_id), "dttime": i.dttime, "message": str(i.message)})
         return v
 
+class ProfileUpdateSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = UserInfo
+        fields = ['status', 'dob',]
+    
+    def validate(self, data):
+        user = self.context['user']
+        return {'user': user, 'status': data['status'], 'dob': data['dob'] }
+
+    def save(self, **kwargs):
+        data = self.validated_data
+        user = data['user']
+        user.status = data['status']
+        user.dob = data['dob']
+        user.save()
+
+class GroupUpdateSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Group
+        fields = ['description', 'name']
+    
+    def validate(self, data):
+        group = Group.objects.get(name=data['name'])
+        return {'group': group, 'description': data['description']}
+
+    def save(self, **kwargs):
+        data = self.validated_data
+        group = data['group']
+        group.description = data['description']
+        group.save()
+
+class GroupMemberSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = Group
+        fields = ['name']
+    
+    def validate(self, data):
+        group = Group.objects.get(name=data['name'])
+        return {'group': group}
+
+    def save(self, **kwargs):
+        data = self.validated_data
+        group = data['group']
+        Members = {'members': [], 'admins': []}
+        for grMember in group.members.all():
+            Members['members'].append(grMember.username)
+        for grMember in group.admins.all():
+            Members['admins'].append(grMember.username)
+        return Members

@@ -16,4 +16,7 @@ urlpatterns = [
     path('friends/', GetFriends.as_view()),
     path('groups/', GetGroups.as_view()),
     path('requests/', GetRequests.as_view()),
+    path('profile/<username>/', ProfileView, name="profile"),
+    path('profileUpdate/', ProfileUpdate.as_view(), name="ProfileUpdate"),
+    path('groupMemberList/', GroupMemberList.as_view(), name="GroupMemberList")
 ]

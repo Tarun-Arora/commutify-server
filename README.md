@@ -12,6 +12,7 @@ Welcome to the Commutify Project. In this project, we have implemented a real-ti
 - Run `python manage.py migrate` to apply migrations.
 - Start the development server using `python manage.py runserver`
 
+	pip install channels-redis
 
 ## API ENDPOINTS
 

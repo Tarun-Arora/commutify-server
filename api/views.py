@@ -2,6 +2,7 @@ from rest_framework import generics, authentication
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
 
 from .serializers import *
 
@@ -218,4 +219,52 @@ class GetRequests(generics.GenericAPIView):
                 'last_name': fr.last_name,
                 'type': 0
             })
+        return Response(data)
+
+@api_view(('GET',))
+def ProfileView(request , username):
+    try:
+        print(username)
+        user = UserInfo.objects.get(username = username)
+        return Response({
+            "username": user.username,
+            "status": user.status,
+            "frcount": user.friends.all().count()
+        }, status=200)
+    except Exception as e:
+        print(e)
+        return Response({'info': 'Bad Request'}, status=404)
+
+class ProfileUpdate(generics.GenericAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = ProfileUpdateSerializer
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.get_serializer(data=request.data, context={'user': user})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({})
+
+class GroupUpdate(generics.GenericAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = GroupUpdateSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({})
+
+class GroupMemberList(generics.GenericAPIView):
+    authentication_classes = [authentication.TokenAuthentication]
+    permission_classes = [IsAuthenticated, ]
+    serializer_class = GroupMemberSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data  = serializer.save()
         return Response(data)
