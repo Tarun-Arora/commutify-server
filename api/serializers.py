@@ -384,13 +384,19 @@ class GroupUpdateSerializer(serializers.ModelSerializer):
         fields = ['description', 'name']
     
     def validate(self, data):
-        group = Group.objects.get(name=data['name'])
-        return {'group': group, 'description': data['description']}
+        print(data)
+        try:
+            id = self.context['id']
+            group = Group.objects.get(id=id)
+            return {'group': group, 'description': data['description'], 'name': data['name']}
+        except:
+            raise serializers.ValidationError({'err': 'Grp Not Found'})
 
     def save(self, **kwargs):
         data = self.validated_data
         group = data['group']
         group.description = data['description']
+        group.name = data['name']
         group.save()
 
 class GroupMemberSerializer(serializers.ModelSerializer):

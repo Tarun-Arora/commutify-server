@@ -18,5 +18,6 @@ urlpatterns = [
     path('requests/', GetRequests.as_view()),
     path('profile/<username>/', ProfileView, name="profile"),
     path('profileUpdate/', ProfileUpdate.as_view(), name="ProfileUpdate"),
+    path('groupUpdate/', GroupUpdate.as_view(), name="GroupUpdate"),
     path('groupMemberList/', GroupMemberList.as_view(), name="GroupMemberList")
 ]
