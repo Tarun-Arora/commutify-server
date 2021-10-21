@@ -224,7 +224,6 @@ class GetRequests(generics.GenericAPIView):
 @api_view(('GET',))
 def ProfileView(request , username):
     try:
-        print(username)
         user = UserInfo.objects.get(username = username)
         return Response({
             "username": user.username,
@@ -234,7 +233,6 @@ def ProfileView(request , username):
             "lname": user.last_name,
         }, status=200)
     except Exception as e:
-        print(e)
         return Response({'info': 'Bad Request'}, status=404)
 
 class ProfileUpdate(generics.GenericAPIView):
@@ -255,7 +253,6 @@ class GroupUpdate(generics.GenericAPIView):
     serializer_class = GroupUpdateSerializer
 
     def post(self, request, *args, **kwargs):
-        print(request.data)
         serializer = self.get_serializer(data=request.data, context={'id': request.data['id']})
         serializer.is_valid(raise_exception=True)
         serializer.save()
