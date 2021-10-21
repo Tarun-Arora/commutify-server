@@ -13,6 +13,7 @@ Welcome to the Commutify Project. In this project, we have implemented a real-ti
 - Start the development server using `python manage.py runserver`
 
 	pip install channels-redis
+	sudo docker run -p 6379:6379 -d redis:5
 
 ## API ENDPOINTS
 

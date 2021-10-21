@@ -229,7 +229,9 @@ def ProfileView(request , username):
         return Response({
             "username": user.username,
             "status": user.status,
-            "frcount": user.friends.all().count()
+            "frcount": user.friends.all().count(),
+            "fname": user.first_name,
+            "lname": user.last_name,
         }, status=200)
     except Exception as e:
         print(e)
@@ -253,7 +255,8 @@ class GroupUpdate(generics.GenericAPIView):
     serializer_class = GroupUpdateSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        print(request.data)
+        serializer = self.get_serializer(data=request.data, context={'id': request.data['id']})
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({})
