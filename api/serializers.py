@@ -355,11 +355,15 @@ class RetrieveMessageSerializer(serializers.ModelSerializer):
         chat = Chat.objects.get(title=data['title'])
         index = data['index']
         msg_list = msg.objects.by_chat(chat)
-        paginator = Paginator(msg_list, 15)
-        page_obj = paginator.get_page(index)
+        print(msg_list)
+        # paginator = Paginator(msg_list, 15)
+        # page_obj = paginator.get_page(index)
         v = []
-        for i in (page_obj.object_list):
-            v.insert(0,{"id":i.id,"sender": str(i.sender_id), "dttime": i.dttime, "message": str(i.message)})
+        ct=0
+        for i in (msg_list):
+            if(i.id<index and ct<15):
+                v.insert(0,{"id":i.id,"sender": str(i.sender_id), "dttime": i.dttime, "message": str(i.message)})
+                ct+=1
         return v
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
