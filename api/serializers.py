@@ -1,5 +1,4 @@
 from django.core.paginator import Paginator
-from django.db.models.query_utils import Q
 from rest_framework import serializers
 from authentication.models import msg, Friend, UserInfo, Group, Chat
 
