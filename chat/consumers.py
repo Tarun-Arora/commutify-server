@@ -6,7 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
-from authentication.models import msg, UserInfo, Chat
+from authentication.models import msg, UserInfo, Chat, Group
 
 
 class ChatConsumer(WebsocketConsumer):
@@ -138,4 +138,101 @@ class MessageUpdate(WebsocketConsumer):
                 'room': room,
                 'sender': sender,
             }))
+        # Send message to WebSocket
+
+
+
+
+
+
+class RequestsSocket(WebsocketConsumer):
+    def connect(self):
+        self.room_name = 'requests'
+        self.room_group_name = 'chat_%s' % self.room_name
+        token = self.scope['url_route']['kwargs']['token']
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name,
+            self.channel_name
+        )
+        try:
+            user = Token.objects.get(key=token).user
+        except:
+            return
+        self.accept()
+
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name,
+            self.channel_name
+        )
+
+    # Receive message from WebSocket
+    def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        type_request = text_data_json['type']
+        username = text_data_json['username']
+        token = self.scope['url_route']['kwargs']['token']
+        print(text_data)
+        try:
+            user = Token.objects.get(key=token).user
+        except:
+            return
+        # Send message to room group
+        if type_request == 0:
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'type_request': type_request,
+                    'username': username,
+                    'sender': str(user.username)
+                }
+            )
+        else:
+            id = text_data_json['id']
+            async_to_sync(self.channel_layer.group_send)(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'type_request': type_request,
+                    'username': username,
+                    'sender': str(user.username),
+                    'id': id
+                }
+            )
+
+    # Receive message from room group
+    def chat_message(self, event):
+        type_request = event['type_request']
+        username = event['username']
+        sender = event['sender']
+
+        token = self.scope['url_route']['kwargs']['token']
+        try:
+            user = Token.objects.get(key=token).user
+        except:
+            return
+        if type_request == 0:
+            if str(user.username) == username:
+                fr = UserInfo.objects.get(username=sender)
+                self.send(text_data=json.dumps({
+                    'username': fr.username,
+                    'first_name': fr.first_name,
+                    'last_name': fr.last_name,
+                    'type': 0
+                }))
+        else:
+            if str(user.username) == username:
+                id = event['id']
+                grp = Group.objects.get(id=id)
+                self.send(text_data=json.dumps({
+                    'id': grp.id,
+                    'name': grp.name,
+                    'type': 1,
+                    'description': grp.description
+                }))
+
+
         # Send message to WebSocket
