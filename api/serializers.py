@@ -382,18 +382,24 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         user.save()
 
 class GroupUpdateSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+    description = serializers.CharField()
+    name = serializers.CharField()
+
     class Meta: 
         model = Group
-        fields = ['description', 'name']
+        fields = ['description', 'name', 'id', ]
     
     def validate(self, data):
-        print(data)
         try:
-            id = self.context['id']
+            id = data['id']
             group = Group.objects.get(id=id)
-            return {'group': group, 'description': data['description'], 'name': data['name']}
         except:
             raise serializers.ValidationError({'err': 'Grp Not Found'})
+        user = self.context['request'].user
+        if user not in group.admins.all():
+            raise serializers.ValidationError("Unauthorized access.")
+        return {'group': group, 'description': data['description'], 'name': data['name']}
 
     def save(self, **kwargs):
         data = self.validated_data
@@ -403,12 +409,17 @@ class GroupUpdateSerializer(serializers.ModelSerializer):
         group.save()
 
 class GroupMemberSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()
+
     class Meta: 
         model = Group
-        fields = ['name']
+        fields = ['id']
     
     def validate(self, data):
-        group = Group.objects.get(name=data['name'])
+        try:
+            group = Group.objects.get(pk=data['id'])
+        except:
+            raise serializers.ValidationError("Invalid Information")
         return {'group': group}
 
     def save(self, **kwargs):

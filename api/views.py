@@ -253,7 +253,7 @@ class GroupUpdate(generics.GenericAPIView):
     serializer_class = GroupUpdateSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data, context={'id': request.data['id']})
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({})
@@ -268,3 +268,15 @@ class GroupMemberList(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         data  = serializer.save()
         return Response(data)
+
+
+@api_view(('GET',))
+def GroupView(request , id):
+    try:
+        grp = Group.objects.get(id=id)
+        return Response({
+            "name": grp.name,
+            "description": grp.description
+        }, status=200)
+    except Exception as e:
+        return Response({'info': 'Bad Request'}, status=404)
