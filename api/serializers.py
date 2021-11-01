@@ -120,13 +120,13 @@ class Grp_RequestSerializer(serializers.ModelSerializer):
             requested_to = UserInfo.objects.get(username=data['username'])
             grp = Group.objects.get(pk=data['id'])
         except:
-            raise serializers.ValidationError("Invalid Information")
+            raise serializers.ValidationError({"error": "Invalid username"})
         if user not in grp.admins.all():
             raise serializers.ValidationError("Unauthorized Response.")
         if grp in requested_to.group_requests.all():
-            raise serializers.ValidationError("Group request already send")
+            raise serializers.ValidationError({"error": "Group request already send"})
         if requested_to in grp.members.all() or requested_to in grp.admins.all():
-            raise serializers.ValidationError("User already in group.")
+            raise serializers.ValidationError({"error": "User already in group."})
         return data
 
 
@@ -265,6 +265,7 @@ class NewAdminSerializer(serializers.ModelSerializer):
     def save(self):
         new_user = UserInfo.objects.get(username=self.validated_data['username'])
         group = Group.objects.get(id=self.validated_data['id'])
+        group.members.remove(new_user)
         group.admins.add(new_user)
         return self.validated_data
 
@@ -296,6 +297,7 @@ class RemoveAdminSerializer(serializers.ModelSerializer):
         new_user = UserInfo.objects.get(username=self.validated_data['username'])
         group = Group.objects.get(id=self.validated_data['id'])
         group.admins.remove(new_user)
+        group.members.add(new_user)
         return self.validated_data
 
 
@@ -316,15 +318,18 @@ class RemoveMemberSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid Information")
         if req_user not in group.admins.all():
             raise serializers.ValidationError("You are not the admin of the group")
-        if new_user not in group.members.all():
+        if new_user not in group.members.all() and new_user not in group.admins.all():
             raise serializers.ValidationError("User not added in the group")
         return data
 
     def save(self):
         new_user = UserInfo.objects.get(username=self.validated_data['username'])
         group = Group.objects.get(id=self.validated_data['id'])
-        group.members.remove(new_user)
-        group.admins.remove(new_user)
+        new_user.groups.remove(group)
+        if new_user in group.members.all():
+            group.members.remove(new_user)
+        else:
+            group.admins.remove(new_user)
         return self.validated_data
 
 
@@ -420,14 +425,26 @@ class GroupMemberSerializer(serializers.ModelSerializer):
             group = Group.objects.get(pk=data['id'])
         except:
             raise serializers.ValidationError("Invalid Information")
+        user = self.context['request'].user
+        if user not in group.admins.all() and user not in group.members.all():
+            raise serializers.ValidationError("Unauthorized access.")
         return {'group': group}
 
     def save(self, **kwargs):
         data = self.validated_data
         group = data['group']
-        Members = {'members': [], 'admins': []}
+        Members = {'members': [], 'admins': [], 'user': []}
+        user = self.context['request'].user
         for grMember in group.members.all():
-            Members['members'].append(grMember.username)
+            if grMember == user:
+                Members['user'].append(
+                    {'username': grMember.username, 'first_name': grMember.first_name, 'last_name': grMember.last_name, 'isAdmin': 0})
+                continue
+            Members['members'].append({'username': grMember.username, 'first_name': grMember.first_name, 'last_name': grMember.last_name})
         for grMember in group.admins.all():
-            Members['admins'].append(grMember.username)
+            if grMember == user:
+                Members['user'].append(
+                    {'username': grMember.username, 'first_name': grMember.first_name, 'last_name': grMember.last_name, 'isAdmin': 1})
+                continue
+            Members['admins'].append({'username': grMember.username, 'first_name': grMember.first_name, 'last_name': grMember.last_name})
         return Members
