@@ -371,19 +371,24 @@ class RetrieveMessageSerializer(serializers.ModelSerializer):
         return v
 
 class ProfileUpdateSerializer(serializers.ModelSerializer):
-    class Meta: 
+    status = serializers.CharField()
+    fname = serializers.CharField()
+    lname = serializers.CharField()
+
+    class Meta:
         model = UserInfo
-        fields = ['status', 'dob',]
+        fields = ['status', 'fname', 'lname']
     
     def validate(self, data):
         user = self.context['user']
-        return {'user': user, 'status': data['status'], 'dob': data['dob'] }
+        return {'user': user, 'status': data['status'], 'fname': data['fname'], 'lname': data['lname'] }
 
     def save(self, **kwargs):
         data = self.validated_data
         user = data['user']
         user.status = data['status']
-        user.dob = data['dob']
+        user.first_name = data['fname']
+        user.last_name = data['lname']
         user.save()
 
 class GroupUpdateSerializer(serializers.ModelSerializer):
