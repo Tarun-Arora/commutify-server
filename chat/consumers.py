@@ -98,6 +98,7 @@ class MessageUpdate(WebsocketConsumer):
         text_data_json = json.loads(text_data)
         message = text_data_json['message']
         room = text_data_json['room']
+        chat_room = Chat.objects.get(title=room)
         try:
             chat = Chat.objects.get(title=room)
         except:
@@ -109,6 +110,8 @@ class MessageUpdate(WebsocketConsumer):
             return
         if(user not in chat.users.all()):
             return
+        q = msg.objects.create(sender_id=user, chat_room=chat_room, message=message, dttime=timezone.now())
+        q.save()
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
             self.room_group_name,
@@ -116,7 +119,7 @@ class MessageUpdate(WebsocketConsumer):
                 'type': 'chat_message',
                 'room': room,
                 'message': message,
-                'sender': str(user.username)
+                'sender': str(user.username),
             }
         )
 
@@ -125,6 +128,7 @@ class MessageUpdate(WebsocketConsumer):
         message = event['message']
         room = event['room']
         sender = event['sender']
+        
 
         chat = Chat.objects.get(title=room)
         token = self.scope['url_route']['kwargs']['token']
@@ -137,6 +141,7 @@ class MessageUpdate(WebsocketConsumer):
                 'message': message,
                 'room': room,
                 'sender': sender,
+                'dttime': str(timezone.now())
             }))
         # Send message to WebSocket
 
