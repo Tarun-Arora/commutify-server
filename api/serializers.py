@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator
 from rest_framework import serializers
-from authentication.models import msg, Friend, UserInfo, Group, Chat
+from authentication.models import msg, Friend, UserInfo, Group, Chat, Image
 
 
 class Fr_RequestSerializer(serializers.ModelSerializer):
@@ -198,7 +198,7 @@ class Grp_CreateSerializer(serializers.ModelSerializer):
         q.admins.set([user])
         q.save()
         user.groups.add(q)
-        return self.validated_data
+        return q.id
 
 
 class Grp_ExitSerializer(serializers.ModelSerializer):
@@ -390,6 +390,61 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
         user.first_name = data['fname']
         user.last_name = data['lname']
         user.save()
+
+
+class ProfileImageUpdateSerializer(serializers.ModelSerializer):
+    img_url = serializers.URLField()
+
+    class Meta:
+        model = Image
+        fields = ['img_url', ]
+
+    def validate(self, data):
+        user = self.context['request'].user
+        return {'user': user, 'img_url': data['img_url']}
+
+    def save(self, **kwargs):
+        data = self.validated_data
+        user = data['user']
+        print(user)
+        name = "user_" + str(user.username)
+        try:
+            img = Image.objects.get(name=name)
+            img.img_url = data['img_url']
+            img.save()
+        except:
+            img = Image.objects.create(name=name, img_url=data['img_url'])
+            img.save()
+
+
+class GroupImageUpdateSerializer(serializers.ModelSerializer):
+    img_url = serializers.URLField()
+    grp_id = serializers.IntegerField()
+
+    class Meta:
+        model = Image
+        fields = ['img_url', 'grp_id']
+
+    def validate(self, data):
+        user = self.context['request'].user
+        try:
+            grp = Group.objects.get(id=data['grp_id'])
+        except:
+            raise serializers.ValidationError("Unauthorized Response.")
+        if user not in grp.admins.all() and user not in grp.members.all():
+            raise serializers.ValidationError("Unauthorized Response.")
+        return {'grp_id': data['grp_id'], 'img_url': data['img_url']}
+
+    def save(self, **kwargs):
+        data = self.validated_data
+        name = "grp_" + str(data['grp_id'])
+        try:
+            img = Image.objects.get(name=name)
+            img.img_url = data['img_url']
+            img.save()
+        except:
+            img = Image.objects.create(name=name, img_url=data['img_url'])
+            img.save()
 
 class GroupUpdateSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField()

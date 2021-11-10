@@ -17,8 +17,11 @@ urlpatterns = [
     path('groups/', GetGroups.as_view()),
     path('requests/', GetRequests.as_view()),
     path('profile/<username>/', ProfileView, name="profile"),
+    path('profileImage/<type>/<code>/', ProfileImage, name="profile_image"),
     path('group/<id>/', GroupView, name="group"),
     path('profileUpdate/', ProfileUpdate.as_view(), name="ProfileUpdate"),
+    path('profileImageUpdate/', ProfileImageUpdate.as_view(), name="ProfileImageUpdate"),
+    path('groupImageUpdate/', GroupImageUpdate.as_view(), name="GroupImageUpdate"),
     path('groupUpdate/', GroupUpdate.as_view(), name="GroupUpdate"),
     path('groupMemberList/', GroupMemberList.as_view(), name="GroupMemberList")
 ]
