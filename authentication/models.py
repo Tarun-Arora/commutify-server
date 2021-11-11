@@ -76,3 +76,8 @@ class ForgotPwdRequest(models.Model):
     email = models.EmailField()
     sttime = models.DateTimeField(auto_now=True)
     otp = models.IntegerField()
+
+
+class Image(models.Model):
+    name = models.CharField(max_length=500)
+    img_url = models.URLField(default=None)
