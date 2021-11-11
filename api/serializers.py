@@ -359,9 +359,6 @@ class RetrieveMessageSerializer(serializers.ModelSerializer):
         chat = Chat.objects.get(title=data['title'])
         index = data['index']
         msg_list = msg.objects.by_chat(chat)
-        print(msg_list)
-        # paginator = Paginator(msg_list, 15)
-        # page_obj = paginator.get_page(index)
         v = []
         ct=0
         for i in (msg_list):
@@ -406,7 +403,6 @@ class ProfileImageUpdateSerializer(serializers.ModelSerializer):
     def save(self, **kwargs):
         data = self.validated_data
         user = data['user']
-        print(user)
         name = "user_" + str(user.username)
         try:
             img = Image.objects.get(name=name)

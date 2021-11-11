@@ -1,8 +1,6 @@
-from django.contrib import admin
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.db.models.deletion import CASCADE, SET_NULL
-from django.db.models.fields import EmailField
+from django.db import models
+from django.db.models.deletion import CASCADE
 
 
 # Create your models here.

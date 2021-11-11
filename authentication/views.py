@@ -1,14 +1,15 @@
-from django.contrib.auth import login
-from django.core.mail import message
 from random import randint
-from authentication.models import ForgotPwdRequest, UserInfo, msg
-from rest_framework import generics, serializers, status
+
+from django.conf import settings
+from django.contrib.auth import login
 from django.core import mail
 from django.views.decorators.csrf import csrf_exempt
-from rest_framework.decorators import api_view
-from django.conf import settings
-from rest_framework.response import Response
+from rest_framework import generics, status
 from rest_framework.authtoken.models import Token
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
+from authentication.models import ForgotPwdRequest, UserInfo
 from authentication.serializers import LoginSerializer, RegisterSerializer, ResetPasswordSerializer
 
 
@@ -78,7 +79,6 @@ def forgotPwdOtp(request, email):
             defaults={'email': email, 'otp': otp}, )
         return Response({'Success': 'OTP has been sent to this email.'})
     except Exception as e:
-        print(e)
         return Response(status=400)
 
 
@@ -106,7 +106,6 @@ def verify(request, email, verify_pin):
         else:
             return Response({'info': 'Bad Request'}, status=400)
     except Exception as e:
-        print(e)
         return Response({'info': 'Bad Request'}, status=400)
 
 
