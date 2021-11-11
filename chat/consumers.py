@@ -48,7 +48,7 @@ class MessageUpdate(WebsocketConsumer):
             return
         if (user not in chat.users.all()):
             return
-        q = msg.objects.create(sender_id=user, chat_room=chat_room, message=message, dttime=timezone.now())
+        q = msg.objects.create(sender_id=user, chat_room=chat_room, message=message, dttime=timezone.now() + timezone.timedelta(hours=5,minutes=30))
         q.save()
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(
@@ -78,7 +78,7 @@ class MessageUpdate(WebsocketConsumer):
                 'message': message,
                 'room': room,
                 'sender': sender,
-                'dttime': str(timezone.now())
+                'dttime': str(timezone.now() + timezone.timedelta(hours=5,minutes=30))
             }))
         # Send message to WebSocket
 
