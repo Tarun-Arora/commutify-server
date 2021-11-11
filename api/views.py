@@ -255,7 +255,6 @@ def ProfileView(request , username):
 def ProfileImage(request , type, code):
     try:
         if int(type) == 1:
-            print(code)
             name = "grp_" + str(code)
         else:
             name = "user_" + str(code)
