@@ -10,9 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 
-import django
-django.setup()
-
 from pathlib import Path
 from decouple import config
 import os
@@ -34,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -41,13 +39,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'channels',
     'corsheaders',
     'rest_framework.authtoken',
     'api',
     'authentication',
     'chat',
 ]
+
+AUTH_USER_MODEL = 'authentication.UserInfo'
+import django
+django.setup()
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -106,7 +107,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-AUTH_USER_MODEL = 'authentication.UserInfo'
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
