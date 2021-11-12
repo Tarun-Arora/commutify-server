@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'chat',
 ]
 
-AUTH_USER_MODEL = 'authentication.UserInfo'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -109,6 +108,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
+AUTH_USER_MODEL = 'authentication.UserInfo'
 LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Kolkata'
