@@ -47,8 +47,6 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'authentication.UserInfo'
-import django
-django.setup()
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
