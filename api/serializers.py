@@ -1,8 +1,6 @@
 from django.core.paginator import Paginator
 from rest_framework import serializers
 
-import django
-django.setup()
 from authentication.models import msg, Friend, UserInfo, Group, Chat, Image
 
 

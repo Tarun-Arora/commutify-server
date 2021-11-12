@@ -5,8 +5,6 @@ from channels.generic.websocket import WebsocketConsumer
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 
-import django
-django.setup()
 from authentication.models import msg, UserInfo, Chat, Group
 
 
