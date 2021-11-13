@@ -29,7 +29,7 @@ class LoginView(generics.GenericAPIView):
         profile_obj = user
         if not profile_obj.is_verified:
             subject = 'Verify Commutify Account'
-            message = f'Hi click the link to verify your commutify account http://localhost:8080/#/verify/{user.email}/{user.verify_pin}/'
+            message = f'Hi click the link to verify your commutify account http://commutify-server.herokuapp.com/auth/verify/{user.username}/{user.verify_pin}/'
             send_mail(user.email, subject, message)
             return Response({'msg': 'Email is not verified, check your mail.'}, status=401)
         dic = {'token': str(create_auth_token(user))}
@@ -49,12 +49,13 @@ class RegisterView(generics.GenericAPIView):
         user.save()
         token = create_auth_token(user)
         subject = 'Verify Commutify Account'
-        message = f'Hi click the link to verify your commutify account http://localhost:8080/#/verify/{user.email}/{user.verify_pin}/'
+        message = f'Hi click the link to verify your commutify account http://commutify-server.herokuapp.com/auth/verify/{user.username}/{user.verify_pin}/'
         send_mail(user.email,subject,message)
         return Response({'Success': 'You are now registered. Please verify your email.'}, status=status.HTTP_200_OK)
 
 
 def send_mail(email, sub, msg):
+    print('abd')
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email]
     try:
